@@ -16,7 +16,7 @@
 	colorlist[8] <- rgb(122,124,166,255, maxColorValue = 255) #8 Admixed
 
   	 
-  popassign2 <- function(x)
+  popassign2 <- function(x,panel_calibration)
 	{	
 		#Column names of populations (In order of SNPweights reference file)
 		europe <- 1
@@ -37,7 +37,13 @@
 		oce <-  (x[oceania] >= 0.2)
 		fil <-  (x[europe] >= 0.4 & x[oceania] < 0.05 & x[africa] < 0.05 & x[americas] < 0.05  & x[cs_asia] < 0.05 & x[e_asia] >= 0.4 )
 		afr2 <- (x[europe] < 0.5 & x[oceania] < 0.05 & x[africa] >= 0.5 &  x[americas] < 0.05  & (x[cs_asia] + x[e_asia]) < 0.10 ) #New African-American addition , more lenient
-
+                
+	        #extra adjustment for Affy UKBB data, eur tends to clsuter with CSA, this is calibrated to matching self-report
+	        if(panel_calibration == "AffyBB")
+		 {
+	           eur <- (x[europe] >= 0.75 & x[oceania] < 0.05 & x[africa] < 0.05 &  x[americas] < 0.05  & x[cs_asia] < 0.2 & x[e_asia] < 0.05 )
+                 }
+	  
 		if(eur)
 		{
 			popfit <- "eur"
@@ -102,6 +108,7 @@ args <- commandArgs(trailingOnly = TRUE)
 
 bfilepreds <- args[1]
 clustercenterpreds <- args[2]
+panel_calibration <- args[3]
 
 
     unlist_split <- function(x, ...)
@@ -119,7 +126,7 @@ clustercenterpreds <- args[2]
 	datam$IID <- NA
 	datam[,c("FID","IID")] <- t(sapply(datam$FID_IID,unlist_split,split=":"))
     print("assigning populations to test data")
-       datam$bestpop_oneweek <- apply(datam[,9:14], 1, popassign2)
+       datam$bestpop_oneweek <- apply(datam[,9:14], 1, popassign2,panel_calibration=panel_calibration)
        write.table(datam, paste(bfilepreds,'.header',sep=''),row.names=F,quote=F) #Write predPC out to a file with a header
        
 print("Assigning colors to test data")
