@@ -26,17 +26,14 @@
 #User: Location of convertf tool from EIGENSOFT (Download from http://www.hsph.harvard.edu/alkes-price/software/)
  eigensoft_loc="$WORKING_DIR"/EIG5.0.2/bin/convertf
  
-#User: Name of the list of ancestry panel SNP rsids (packaged with script, be sure that this is in WORKING_DIR)
- snpweights_snplist=hgdp_kgp_merged_v3_jointsample_v4_k6_bb.snplist
- 
-#User: Name of ancestry panel (packaged with script, be sure that this is in WORKING_DIR)
- snpweightfile_path=hgdp_kgp_merged_v3_jointsample_v4_k6_bb.snpweightrefpanel
- 
-#User: Name of ancestry panel cluster centers (packaged with script, be sure that this is in WORKING_DIR)
- snpweight_clustercenters=hgdp_kgp_merged_v3_jointsample_v4_k6_bb.snpweightrefpanel_clustercenters.csv
 
 #User: Name of panel chosen ('Default': works for most illumina. AffyBB: Designed for Affy biobank chip. GSA: Designed for Illumina GSA)
  panel=Default
+ 
+#This will supply: 
+#Name of the list of ancestry panel SNP rsids (packaged with script, be sure that this is in WORKING_DIR)
+#Name of ancestry panel (packaged with script, be sure that this is in WORKING_DIR)
+#Name of ancestry panel cluster centers (packaged with script, be sure that this is in WORKING_DIR)
  
  if [ $panel == "Default" ]
  then
