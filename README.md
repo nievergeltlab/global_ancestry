@@ -17,4 +17,4 @@ Download and unzip the repository. Maintain the directory structure of the githu
 Open ancestry_pipeline.sh. Modify the script where directed (where it says "User:"), giving the paths to relevant files.
 
 ## Output
-the .predpc_header file contains all relevant information (subject IDs, projections onto reference population PCs, ancestry proportion estimates, and overall ancestry group classification). The pdf file contains a plot of subjects projected onto reference population PCs.
+the .predpc_oneweek.header file contains all relevant information (subject IDs, projections onto reference population PCs, ancestry proportion estimates, and overall ancestry group classification). The pdf file contains a plot of subjects projected onto reference population PCs.
