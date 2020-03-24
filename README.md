@@ -6,6 +6,8 @@ Panel for PGC-PTSD global ancestry estimation. Designed to run with most Illumin
 ## Installation Requirements:
 R (version 3 or above)  
 SNPweights https://www.hsph.harvard.edu/alkes-price/software/  
+Eigensoft https://www.hsph.harvard.edu/alkes-price/software/  
+PLINK 1.9 beta https://www.cog-genomics.org/plink/  
 PRE-quality control genotype data. Absolutely must be pre-QC genotype data!  
 
 ## Installation
