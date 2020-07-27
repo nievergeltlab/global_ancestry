@@ -63,8 +63,8 @@
 #For Illumina panels: Go to the kit support page for the array, click downloads, then click ArrayNameHere support files
 #the file should be under the name of "ArrayNameHere Loci Name to rsID Conversion File"
 
- illumina_snplist=ukb_affy_to_snp.txt
-
+ illumina_snplist=Multi-EthnicGlobal_B1_b144_rsids.txt # ukb_affy_to_snp.txt
+#multi-ethnic-global-8-b1-rsids.zip
 ###Ancestry determination steps
 
 #Use Illumina supplied list of SNPs that can be renamed
