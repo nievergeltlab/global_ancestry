@@ -56,6 +56,14 @@
   snpweight_clustercenters=hgdp_kgp_merged_v3_jointsample_v4_k6_bb.snpweightrefpanel_clustercenters.csv
  fi
  
+  if [ $panel == "Custom" ]
+ then
+  snpweights_snplist=gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE.snplist
+  snpweightfile_path=gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE.snpweightrefpanel
+  snpweight_clustercenters=gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE.snpweightrefpanel_clustercenters.csv
+ fi
+ 
+ 
 #Give path of Manufacturer SNP ID to rs-id conversion table.
 #Illumina/Affy provide these 
 #UK Biobank Array snplist already provided
@@ -63,7 +71,9 @@
 #For Illumina panels: Go to the kit support page for the array, click downloads, then click ArrayNameHere support files
 #the file should be under the name of "ArrayNameHere Loci Name to rsID Conversion File"
 
- illumina_snplist=Multi-EthnicGlobal_B1_b144_rsids.txt # ukb_affy_to_snp.txt
+ illumina_snplist=Multi-EthnicGlobal_B1_b144_rsids.txt 
+ 
+ #UKBB: ukb_affy_to_snp.txt
 #multi-ethnic-global-8-b1-rsids.zip
 ###Ancestry determination steps
 
