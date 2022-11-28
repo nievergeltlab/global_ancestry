@@ -18,3 +18,7 @@ Open ancestry_pipeline.sh. Modify the script where directed (where it says "User
 
 ## Output
 the .predpc_oneweek.header file contains all relevant information (subject IDs, projections onto reference population PCs, ancestry proportion estimates, and overall ancestry group classification). The pdf file contains a plot of subjects projected onto reference population PCs.
+
+
+##Custom Panels:
+We support custom panels. Follow 00_global_ancestry_panel_v2.sh for example.  
