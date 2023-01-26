@@ -45,6 +45,8 @@ ls gsa/* | grep bed | sed 's/.bed//g' | awk '{print $1".bed",$1".bim",$1".fam"}'
 # Notice that in the merge step, the missing phenotype code is 1. This is because eigenstrat will remove data with phenotype values = 0
  plink --merge-list gsa/gsaF.mergelist --make-bed --output-missing-phenotype 1 --out gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE
 
+ plink --merge-list gsa/gsaF.mergelist --make-bed --keep refsamplek6_jan26_2023_v2.txt --output-missing-phenotype 1 --out gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE
+
 
 ## SNPweights panel curation
 
@@ -143,10 +145,13 @@ R
 
  pdf('gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE.evec_fixed.pdf',7,7)
  plot(refdat_pos$PC1,refdat_pos$PC2,col=refdat_pos$color,pch=18)
+
   plot(refdat_pos$PC1,refdat_pos$PC3,col=refdat_pos$color,pch=18)
   plot(refdat_pos$PC1,refdat_pos$PC4,col=refdat_pos$color,pch=18)
   plot(refdat_pos$PC1,refdat_pos$PC5,col=refdat_pos$color,pch=18)
   plot(refdat_pos$PC1,refdat_pos$PC6,col=refdat_pos$color,pch=18)
+  
+  
  dev.off()
  
  
