@@ -42,11 +42,37 @@ done
 
 ls gsa/* | grep bed | sed 's/.bed//g' | awk '{print $1".bed",$1".bim",$1".fam"}' | grep -v allchr | grep  USE2 > gsa/gsaF.mergelist
 
-# Notice that in the merge step, the missing phenotype code is 1. This is because eigenstrat will remove data with phenotype values = 0
- plink --merge-list gsa/gsaF.mergelist --make-bed --output-missing-phenotype 1 --out gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE
+ plink --merge-list gsa/gsaF.mergelist --make-bed --keep newref.subjects.plink --output-missing-phenotype 1 --out gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USEA
 
- plink --merge-list gsa/gsaF.mergelist --make-bed --keep refsamplek6_jan26_2023_v2.txt --output-missing-phenotype 1 --out gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE
 
+grep -P "A\tT" gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USEA.bim > ambiguous_snps.txt
+grep -P "T\tA" gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USEA.bim >> ambiguous_snps.txt
+grep -P "C\tG" gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USEA.bim >> ambiguous_snps.txt
+grep -P "G\tC" gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USEA.bim >> ambiguous_snps.txt
+
+#Need markers with maf > 1% in every continental population. If you don't do this, may get excessive relatedness between populations with relatively low FST.
+sed 's/:/ /g' newref.ind_fixed | awk '{if ($4 == "EUR")print $1,$2}'  > newref.ind_fixed.eur
+sed 's/:/ /g' newref.ind_fixed | awk '{if ($4 == "AFR")print  $1,$2}'  > newref.ind_fixed.afr
+sed 's/:/ /g' newref.ind_fixed | awk '{if ($4 == "SAS")print $1,$2}'  > newref.ind_fixed.sas
+sed 's/:/ /g' newref.ind_fixed | awk '{if ($4 == "EAS")print $1,$2}'  > newref.ind_fixed.eas
+sed 's/:/ /g' newref.ind_fixed | awk '{if ($4 == "AMR")print $1,$2}'  > newref.ind_fixed.amr
+
+#List only rare markers for each group (MAF < 1%
+plink --bfile gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USEA --keep newref.ind_fixed.amr --max-maf 0.01 --write-snplist --out  gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE_PREFILTER.amr
+plink --bfile gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USEA --keep newref.ind_fixed.afr --max-maf 0.01 --write-snplist --out  gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE_PREFILTER.afr
+plink --bfile gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USEA --keep newref.ind_fixed.sas --max-maf 0.01 --write-snplist --out  gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE_PREFILTER.sas
+plink --bfile gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USEA --keep newref.ind_fixed.eas --max-maf 0.01 --write-snplist --out  gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE_PREFILTER.eas
+plink --bfile gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USEA --keep newref.ind_fixed.eur --max-maf 0.01 --write-snplist --out  gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE_PREFILTER.eur
+
+cat gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE_PREFILTER.*.snplist > remove_maf01.snplist
+
+cat ambiguous_snps.txt remove_maf01.snplist > exclusions.snplist 
+
+plink --bfile gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USEA --geno 0.05 --exclude exclusions.snplist --make-bed --out  gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE_PREFILTER
+
+plink --bfile gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE_PREFILTER --indep-pairwise 1000 50 0.2
+
+plink --bfile gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE_PREFILTER --extract plink.prune.in --make-bed --out gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE
 
 ## SNPweights panel curation
 
