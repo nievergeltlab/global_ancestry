@@ -208,7 +208,7 @@ n
 
 
 #SNPweights file 
- gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE.snpweightrefpanel
+ gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE.snpweightrefpanel
 
 #Ancestry specific cluster medians for plotting
  gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE.snpweightrefpanel_clustercenters.csv
