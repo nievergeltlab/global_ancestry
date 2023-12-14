@@ -17,15 +17,16 @@ done
 
 # User: You must make a SNP list of all markers in your test dataset. 
  # Example: Make a SNP list from a .bim file
- awk '{print $2}' testdata.bim > testdata.snplist
+ #For MVP, see script of getting post qc markers. MVP_postqc.snplist
 
 # Subset the HGDP+KGP VCF file to only reference subjects, and only the test data SNP list 
 # Then convert data into PLINK format
-for chr in {1..22}
+for chr in {1..22}  # {1..21} #22 14 remains!
 do
- bcftools view -S newref.subjects  --include ID==@testdata.snplist -m2 -M2  -Oz gnomad.genomes.v3.1.2.hgdp_tgp.chr"$chr".vcf.bgz > gsa/gnomad.genomes.v3.1.2.hgdp_tgp.chr"$chr".FILTERED.USE.vcf.bgz
+ #bcftools view -S newref.subjects  --include ID==@MVP_postqc.snplist -m2 -M2  -Oz gnomad.genomes.v3.1.2.hgdp_tgp.chr"$chr".vcf.bgz > gsa/gnomad.genomes.v3.1.2.hgdp_tgp.chr"$chr".FILTERED.USE.vcf.bgz
  plink --vcf gsa/gnomad.genomes.v3.1.2.hgdp_tgp.chr"$chr".FILTERED.USE.vcf.bgz --keep newref.subjects.plink --make-bed --out gsa/gnomad.genomes.v3.1.2.hgdp_tgp.chr"$chr".FILTERED.USE.vcf.bgz
 done
+
 
 # Attempt to merge all datasets. 
 # It will very likely give an error about duplicate markers
@@ -42,17 +43,19 @@ done
 
 ls gsa/* | grep bed | sed 's/.bed//g' | awk '{print $1".bed",$1".bim",$1".fam"}' | grep -v allchr | grep  USE2 > gsa/gsaF.mergelist
 
+# Notice that in the merge step, the missing phenotype code is 1. This is because eigenstrat will remove data with phenotype values = 0
  plink --merge-list gsa/gsaF.mergelist --make-bed --keep newref.subjects.plink --output-missing-phenotype 1 --out gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USEA
 
 
+#Get ambiguous alleles
 grep -P "A\tT" gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USEA.bim > ambiguous_snps.txt
 grep -P "T\tA" gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USEA.bim >> ambiguous_snps.txt
 grep -P "C\tG" gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USEA.bim >> ambiguous_snps.txt
 grep -P "G\tC" gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USEA.bim >> ambiguous_snps.txt
 
-#Need markers with maf > 1% in every continental population. If you don't do this, may get excessive relatedness between populations with relatively low FST.
+#Need markers with maf > 1% in continental populations
 sed 's/:/ /g' newref.ind_fixed | awk '{if ($4 == "EUR")print $1,$2}'  > newref.ind_fixed.eur
-sed 's/:/ /g' newref.ind_fixed | awk '{if ($4 == "AFR")print  $1,$2}'  > newref.ind_fixed.afr
+sed 's/:/ /g' newref.ind_fixed | awk '{if ($4 == "AFR")print $1,$2}'  > newref.ind_fixed.afr
 sed 's/:/ /g' newref.ind_fixed | awk '{if ($4 == "SAS")print $1,$2}'  > newref.ind_fixed.sas
 sed 's/:/ /g' newref.ind_fixed | awk '{if ($4 == "EAS")print $1,$2}'  > newref.ind_fixed.eas
 sed 's/:/ /g' newref.ind_fixed | awk '{if ($4 == "AMR")print $1,$2}'  > newref.ind_fixed.amr
@@ -68,17 +71,29 @@ cat gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE_PREFILTER.*.snplist >
 
 cat ambiguous_snps.txt remove_maf01.snplist > exclusions.snplist 
 
+#filter to only decently genotyped markers, that are not on the excluded marker list
 plink --bfile gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USEA --geno 0.05 --exclude exclusions.snplist --make-bed --out  gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE_PREFILTER
 
+#LD prune markers
 plink --bfile gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE_PREFILTER --indep-pairwise 1000 50 0.2
-
 plink --bfile gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE_PREFILTER --extract plink.prune.in --make-bed --out gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE
 
 ## SNPweights panel curation
 
 # Set path to convertf/smartpca programs
- convertf_path=/mnt/sdb/genetics/ricopili/EIG5.0.2/bin/convertf
- smartpca_path=/mnt/sdb/genetics/ricopili/EIG5.0.2/bin/smartpca
+ convertf_path=/mnt/ukbb/ancestry_calling/ancestry_pipeline/EIG5.0.2/bin/convertf
+ smartpca_path=/mnt/ukbb/ancestry_calling/ancestry_pipeline/EIG5.0.2/bin/smartpca
+ 
+#Note: To run SNPweights, you need a version of smartpca that gives the trace in the log file (5.0.2 and earlier OR recompile)
+ 
+#2. Go to directory /src/eigensrc/
+#3. Open smartpca.c
+#4. Find the string: printf("trace: %9.3f\n", y);
+#5. Remove the comment characters (") to make the code an active line.
+#In version 7.2.1, the code is located at line #1079. In version 6.1.4, the code is at line #1138.
+#The SMARTPCA program still calculates trace, changing the code outputs the value of trace for
+#use by SNPweights software.
+
  
 # Make a parameter file for convertf
 echo " 
@@ -140,9 +155,9 @@ snpwtoutput: ../gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE.snpweight
  #Sort data 
  #Add header and populations origins to data
  
-	awk '{print $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13}' gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE.evec | sed 's/#eigvals:/FID IID /g' |  sed 's/:/ /g' | sed 's/Case//g' | sort -g -k 1,1b | join  <(sed 's/:/ /g' newref.ind_fixed | cat newref.header - | LC_ALL=C sort -k1b,1)  - > gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE.evec_fixed
- awk '{print $2}' gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE.bim > gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE.snplist
-
+ #adjust EVEC file for plotting
+ awk '{print $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13}' gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE.evec | sed 's/#eigvals:/FID IID /g' |  sed 's/:/ /g' | sed 's/Case//g' | sort -g -k 1,1b | join  <(sed 's/:/ /g' newref.ind_fixed | cat newref.header - | LC_ALL=C sort -k1b,1)  - > gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE.evec_fixed
+ 
 
 R
  #WR colorlist
@@ -184,10 +199,13 @@ R
  library(plyr)
  
  mymedians <- ddply(refdat_pos, ~ WR, colwise(median,.(PC1,PC2,PC3,PC4,PC5)))
- write.csv(mymedians, 'gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE.snpweightrefpanel_clustercenters.csv',row.names=F)
+ write.csv(mymedians, 'gsa/gnomad_mvp.snpweightrefpanel_clustercenters.csv',row.names=F)
 
+q()
+n
 
-### This will have produced 3 output files
+### Important output files. Use these files as parameter inputs into the global ancestry panel (ancestry_pipeline.sh) as a custom panel!h
+
 
 #SNPweights file 
  gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE.snpweightrefpanel
@@ -196,6 +214,6 @@ R
  gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE.snpweightrefpanel_clustercenters.csv
 
 #SNP list of all markers in referenece pnael
- gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE.snplist
+#Get SNP list
+ awk '{print $2}' gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE.bim > gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE.snplist
 
-#Use these files as parameter inputs into the global ancestry panel (ancestry_pipeline.sh) as a custom panel!
