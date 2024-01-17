@@ -1,0 +1,105 @@
+SNPweights version 2.1 04/29/2014
+
+Chen et al. "Improved ancestry inference using weights from external reference panels", Bioinformatics (2013), 29, 1399-406.
+
+SNPweights is a software based on Python language for ancestry inference using genome-wide SNP weights precomputed from large external reference panels. SNPweights takes SNP genotypes from one or more individual as target sample and predicts principal components (PCs) for the target sample. The predicted PCs can be readily applied in association studies for population stratification correction. Percent ancestry component will also be estimated. 
+
+Questions?
+email Chia-Yen Chen, cychen@mail.harvard.edu
+
+----------------------------
+NEW!
+SNPweights2.1  4/29/2014
+Bugfix of inferanc program. Now works with all snpwt files supllied.
+calc_snpwt.py now takes output from EIG4.2 and EIG5.0.2 to create costumized SNP weights. 
+
+SNPweights2.0  1/31/2014
+Include snpwt.NA derived with CEU, YRI, (CHB+CHD) and Native American reference samples
+New format snpwt file containing model parameters for new inferancestry.py
+InferAnc implimented in C++ for fast ancestry inference
+Include calc_snpwt.py and calc_snpwt.par for user to derive SNP weights using their own reference samples
+
+----------------------------
+Infer ancestry for target samples using inferancestry.py and inferancestry.par
+
+To use SNPweights software for ancestry inference on target samples, keep inferancestry.py and inferancestry.par in the same folder and run the program from it.
+Specify target sample genotype files and the SNP weight file (snpwt.AA, snpwt.CO, snpwt.EA or snpwt.NA) in inferancestry.par
+inferancestry.py will check for reference allele and strand between the SNP weights and input genotypes. It will use the intersection of the SNP weights and input genotypes to perform ancestry inference.
+
+Syntax: 
+For python version 
+inferancestry.py --par ./inferancestry.par
+--par or -p specifies the parameter file.
+
+For C++ version
+InferAnc -p ./inferancestry.par
+
+----------
+Parameter file format: (an example parameter file inferancestry.par is provided)
+geno:   input genotype file   (in EIGENSTRAT format)
+snp:    input snp file        (in EIGENSTRAT format)
+ind:    input individual file (in EIGENSTRAT format)
+snpwt:  specify 1 set of SNP weights to use for ancestry inference. See below.
+predpcoutput: output file of predicted PCs and % ancestry
+
+----------
+Input files (geno, snp, ind) format:
+SNPweights supports EIGENSTRAT format. See http://www.hsph.harvard.edu/faculty/alkes-price/software/ for more details on EIGENSTRAT format in EIGENSOFT software. CONVERTF is a part of EIGENSOFT software and can convert other file formats, including PLINK format, into EIGENSTRAT format. Files of 5 ASW samples with 100K random SNPs from HapMap 3 in EIGENSTRAT format are provided as example.
+
+----------
+SNP weights (snpwt) specifies the ancestry inference model which will be apply to the target samples. 
+Choose one of snpwt.AA, snpwt.CO, snpwt.EA, snpwt.NA, or use the SNP weights derived from your own reference samples.
+snpwt.AA was built with YRI and CEU samples from HapMap 3. 
+snpwt.CO was built with YRI, CEU, CHB and CHD (representing East Asian [ASI]) samples from HapMap 3. 
+snpwt.EA was built with European American samples (Northwest European [NWE], Southeast European [SEE] and Ashkenazi Jews [AJW]) from Framingham Heart Study.
+snpwt.NA was built with YRI, CEU, CHB and CHD (representing East Asian [ASI]) samples from HapMap 3, and Native American samples (NAT) from Reich et al. Nature 2012.
+
+snpwt file format: 
+1st line: 		 shrinkage for the predicted PCs
+2nd line: 		 ancestral populations
+3rd line: 		 number of ancestral samples for each popualtion
+4th line: 		 average PCs for each ancestral popualtion
+5th line: 		 parameter for linear transformation of PCs to % ancestry
+Following lines: SNP rs number, reference allele, variant allele, reference allele frequency, SNP weight for PC1
+
+----------
+output file (predpcoutput) format:
+The first 3 columns are sample ID, population label, number of SNPs used for inference
+The next (k-1) columns are predicted PCs, where k is the number of reference population groups. E.g. for output using snpwt.AA, which include YRI and CEU and reference samples, k = 2 and predicted PC1 will be calculated. The program will decide how many PCs to predict based on the snpwt file in use.
+The next k columns are inferred % ancestry, where k is the number of reference population groups. The population labels of inferred % ancestry is in the snpwt file.
+
+E.g.
+If use snpwt.AA, the 6 columns in output file are: 
+sample ID, population label, number of SNPs used for inference, predicted PC1, % CEU ancestry, % YRI ancestry
+If use snpwt.CO, the 8 columns in output file are: 
+sample ID, population label, number of SNPs used for inference, predicted PC1, predicted PC2, % CEU ancestry, % YRI ancestry, % East Asian ancestry
+If use snpwt.EA, the 8 columns in output file are: 
+sample ID, population label, number of SNPs used for inference, predicted PC1, predicted PC2, % Northwest European ancestry, % Southeast European ancestry, % Ashkenazi Jewish ancestry
+If use snpwt.NA, the 10 columns in output file are: 
+sample ID, population label, number of SNPs used for inference, predicted PC1, predicted PC2, predicted PC3, % YRI ancestry, % CEU ancestry, % East Asian ancestry, % NAtive American Ancestry
+
+----------------------------
+Derive SNP weights using calc_snpwt.py and calc_snpwt.par
+
+To use SNPweights software for calculating SNP weights with customized reference samples, keep calc_snpwt.py and calc_snpwt.par in the same folder and run the program from it.
+Require first running smartpca (POPGEN in EIGENSOFT) to obtain eigenvectors and eigenvalues from the reference sampels.
+Specify reference sample genotype files and the smartpca output files (reference.evec, reference.eval, reference.log) in calc_snpwt.par
+calc_snpwt.py will check for the population label in reference sample genotype file (reference.geno) and automatically determine how many predicted PCs and inferred % ancestry are needed based on the number of populations in population labels. E.g. for the snpwt.AA file, the reference samples were labeled as either "CEU" or "YRI" in the .geno file.
+
+Syntax: 
+calc_snpwt.py --par ./calc_snpwt.par
+--par or -p specifies the parameter file.
+
+----------
+Input files (geno, snp, ind) format:
+SNPweights supports EIGENSTRAT format. See above.
+
+----------
+Parameter file format: (an example parameter file calc_snpwt.par is provided)
+geno: input genotype file   (in EIGENSTRAT format)
+snp:  input snp file   (in EIGENSTRAT format)
+ind:  input ind file   (in EIGENSTRAT format)
+evec: .evec file from smartpca (POPGEN in EIGENSOFT)
+eval: .eval file from smartpca (POPGEN in EIGENSOFT)
+log:  .log file from smartpca (POPGEN in EIGENSOFT)
+snpwtoutput: output file of SNP weights

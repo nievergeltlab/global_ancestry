@@ -1,0 +1,5 @@
+geno:  ./example_asw.geno
+snp:   ./example_asw.snp
+ind:   ./example_asw.ind
+snpwt: ./snpwt.EA
+predpcoutput: ./EA.predpc

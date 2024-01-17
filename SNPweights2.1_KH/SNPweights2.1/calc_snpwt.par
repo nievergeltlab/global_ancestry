@@ -1,0 +1,7 @@
+geno: ./reference.geno
+snp:  ./reference.snp
+ind:  ./reference.ind
+evec: ./reference.evec
+eval: ./reference.eval
+log:  ./reference.log
+snpwtoutput: ./snpwt.reference
