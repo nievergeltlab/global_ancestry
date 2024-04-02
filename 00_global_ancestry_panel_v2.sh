@@ -81,9 +81,9 @@ plink --bfile gsa/gnomad.genomes.v3.1.2.hgdp_tgp.allchr.FILTERED.USE_PREFILTER -
 ## SNPweights panel curation
 
 # Set path to convertf/smartpca programs
- convertf_path=/mnt/ukbb/ancestry_calling/ancestry_pipeline/EIG5.0.2/bin/convertf
- smartpca_path=/mnt/ukbb/ancestry_calling/ancestry_pipeline/EIG5.0.2/bin/smartpca
- 
+ convertf_path=/home/genetics/EIG-master/bin/convertf
+ smartpca_path=/home/genetics/EIG-master/bin/smartpca
+
 #Note: To run SNPweights, you need a version of smartpca that gives the trace in the log file (5.0.2 and earlier OR recompile)
  
 #2. Go to directory /src/eigensrc/
