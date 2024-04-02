@@ -25,7 +25,7 @@
  
 #User: Location of convertf tool from EIGENSOFT (Download from http://www.hsph.harvard.edu/alkes-price/software/)
  eigensoft_loc="$WORKING_DIR"/EIG5.0.2/bin/convertf
- 
+ #eigensoft_loc=/home/genetics/EIG-master/bin/convertf
 
 #User: Name of panel chosen ('Default': works for most illumina. AffyBB: Designed for Affy biobank chip. GSA: Designed for Illumina GSA)
  panel=Default
