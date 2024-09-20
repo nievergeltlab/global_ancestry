@@ -90,6 +90,8 @@
 #replacing the final 'bash' command with your job submission command.
  chmod u+rwx scripts/call_ancestry_v2_may6_2016.sh
  bash scripts/call_ancestry_v2_may6_2016.sh $plink_location $bfile $rsidfile $bfile_directory $snpweights_snplist $snpweights_path $snpweightfile_path $eigensoft_loc
+ #Use for the newer panels (full genome panels)
+  bash scripts/call_ancestry_v3_aug13_2024.sh $plink_location $bfile $rsidfile $bfile_directory $snpweights_snplist $snpweights_path $snpweightfile_path $eigensoft_loc
 
 #Combine the SNPweights ancestry calls
  cat temporary_files/"$bfile"_anc_*.predpc_oneweek  > ancestry/"$bfile".predpc_oneweek
