@@ -44,7 +44,7 @@
  
   if [ $panel == "GSA" ]
  then
-  snpweights_snplist=hgdp_kgp_merged_v3_jointsample_v4_k6.snplist
+  snpweights_snplist=hgdp_kgp_merged_gsaqced_v3_jointsample_v4_k6.snplist
   snpweightfile_path=hgdp_kgp_merged_gsa_v3_jointsample_v4_k6.snpweightrefpanel
   snpweight_clustercenters=hgdp_kgp_merged_gsa_v3_jointsample_v4_k6_forsnpweights.snpweightrefpanel_clustercenters.csv
  fi
