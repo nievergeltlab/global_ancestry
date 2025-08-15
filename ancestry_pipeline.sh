@@ -45,8 +45,8 @@
   if [ $panel == "GSA" ]
  then
   snpweights_snplist=hgdp_kgp_merged_gsaqced_v3_jointsample_v4_k6.snplist
-  snpweightfile_path=hgdp_kgp_merged_gsa_v3_jointsample_v4_k6.snpweightrefpanel
-  snpweight_clustercenters=hgdp_kgp_merged_gsa_v3_jointsample_v4_k6_forsnpweights.snpweightrefpanel_clustercenters.csv
+  snpweightfile_path=hgdp_kgp_merged_gsaqced_v3_jointsample_v4_k6.snpweightrefpanel
+  snpweight_clustercenters=hgdp_kgp_merged_gsaqced_v3_jointsample_v4_k6_forsnpweights.snpweightrefpanel_clustercenters.csv
  fi
  
  if [ $panel == "AffyBB" ]
@@ -101,5 +101,6 @@
  Rscript --vanilla "$WORKING_DIR"/scripts/ancestry_plots_v4_mar1_2017.R "$bfile".predpc_oneweek ../"$snpweight_clustercenters" $panel
 
  
+
 
 
